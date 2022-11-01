@@ -4,9 +4,6 @@ import SignInSide from "./SignIn";
 import Hello from "./DashBoardPage";
 import SignUp from "./SignUpPage";
 
-// import { AuthProvider } from "./Auth";
-// import PrivateRoute from "./PrivateRoute";
-
 function App() {
   return (
     // <AuthProvider>
