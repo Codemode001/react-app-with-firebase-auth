@@ -12,6 +12,12 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+
+import { auth } from "./firebase-config";
 
 const theme = createTheme();
 
@@ -23,6 +29,23 @@ export default function SignInSide() {
       email: data.get("email"),
       password: data.get("password"),
     });
+  };
+
+  const [loginEmail, setLoginEmail] = React.useState("");
+  const [loginPassword, setLoginPassword] = React.useState("");
+
+  const login = async () => {
+    try {
+      const user = await signInWithEmailAndPassword(
+        auth,
+        loginEmail,
+        loginPassword
+      );
+      console.log(user);
+    } catch (error) {
+      console.log(error.message);
+      alert("invalid email or password");
+    }
   };
 
   return (
@@ -76,6 +99,9 @@ export default function SignInSide() {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                onChange={(event) => {
+                  setLoginEmail(event.target.value);
+                }}
               />
               <TextField
                 margin="normal"
@@ -86,13 +112,17 @@ export default function SignInSide() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(event) => {
+                  setLoginPassword(event.target.value);
+                }}
               />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
-                href="/dashboard"
+                // href="/dashboard"
+                onClick={login}
               >
                 Sign In
               </Button>

@@ -12,6 +12,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
+import { auth } from "./firebase-config";
 
 const theme = createTheme();
 
@@ -23,6 +26,33 @@ export default function SignUp() {
       email: data.get("email"),
       password: data.get("password"),
     });
+  };
+
+  const [registerEmail, setRegisterEmail] = React.useState("");
+  const [registerPassword, setRegisterPassword] = React.useState("");
+  // const [firstName, setFirstName] = React.useState("");
+  // const [lastName, setLastName] = React.useState("");
+
+  const register = async () => {
+    try {
+      const user = await createUserWithEmailAndPassword(
+        auth,
+        registerEmail,
+        registerPassword
+        // firstName,
+        // lastName
+      );
+      console.log(user);
+    } catch (error) {
+      console.log(error.message);
+      if (!registerEmail && !registerPassword) {
+        alert("please input something");
+      } else {
+        alert(
+          "Email must be in Email format and password must be 6 characters"
+        );
+      }
+    }
   };
 
   return (
@@ -50,7 +80,7 @@ export default function SignUp() {
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              {/* <Grid item xs={12} sm={6}>
                 <TextField
                   autoComplete="given-name"
                   name="firstName"
@@ -59,6 +89,9 @@ export default function SignUp() {
                   id="firstName"
                   label="First Name"
                   autoFocus
+                  onChange={(event) => {
+                    setFirstName(event.target.value);
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -69,8 +102,11 @@ export default function SignUp() {
                   label="Last Name"
                   name="lastName"
                   autoComplete="family-name"
+                  onChange={(event) => {
+                    setLastName(event.target.value);
+                  }}
                 />
-              </Grid>
+              </Grid> */}
               <Grid item xs={12}>
                 <TextField
                   required
@@ -79,6 +115,9 @@ export default function SignUp() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  onChange={(event) => {
+                    setRegisterEmail(event.target.value);
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -90,6 +129,9 @@ export default function SignUp() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                  onChange={(event) => {
+                    setRegisterPassword(event.target.value);
+                  }}
                 />
               </Grid>
             </Grid>
@@ -98,6 +140,7 @@ export default function SignUp() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              onClick={register}
             >
               Sign Up
             </Button>
