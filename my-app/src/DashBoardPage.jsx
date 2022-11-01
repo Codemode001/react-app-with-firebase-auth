@@ -1,15 +1,14 @@
 import * as React from "react";
 import "./styles.css";
 import Button from "@mui/material/Button";
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-} from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 import { auth } from "./firebase-config";
+import { useNavigate } from "react-router-dom";
 
 export default function DashBoard() {
+  const navigate = useNavigate();
+
   const [user, setUser] = React.useState({});
   onAuthStateChanged(auth, (currentUser) => {
     setUser(currentUser);
@@ -17,6 +16,7 @@ export default function DashBoard() {
 
   const logout = async () => {
     await signOut(auth);
+    navigate("/");
   };
 
   return (

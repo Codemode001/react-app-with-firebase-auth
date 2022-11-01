@@ -3,8 +3,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -12,16 +10,16 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 import { auth } from "./firebase-config";
 
 const theme = createTheme();
 
 export default function SignInSide() {
+  const navigate = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -41,6 +39,7 @@ export default function SignInSide() {
         loginEmail,
         loginPassword
       );
+      navigate("/dashboard");
       console.log(user);
     } catch (error) {
       console.log(error.message);
@@ -116,6 +115,7 @@ export default function SignInSide() {
                   setLoginPassword(event.target.value);
                 }}
               />
+
               <Button
                 type="submit"
                 fullWidth
@@ -126,6 +126,7 @@ export default function SignInSide() {
               >
                 Sign In
               </Button>
+
               <Grid container>
                 <Grid item>
                   <Link href="/sign-up" variant="body2">
