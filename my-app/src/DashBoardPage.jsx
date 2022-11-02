@@ -1,11 +1,11 @@
 import * as React from "react";
-import "./styles.css";
 import Button from "@mui/material/Button";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect } from "react";
-
 import { auth } from "./firebase-config";
 import { useNavigate } from "react-router-dom";
+
+import "./styles.css";
 
 export default function DashBoard() {
   const navigate = useNavigate();
@@ -30,15 +30,27 @@ export default function DashBoard() {
     navigate("/");
   };
 
+  const crud = () => {
+    navigate("/crud");
+  };
+
   return (
     <div>
       <div id="dashboard-body">
         <h1 id="dashboard-welcome">Welcome to dashboard {user?.email}</h1>
       </div>
+
       <div id="dashboard-signout">
-        <Button id="dashboard-button" onClick={logout}>
-          Sign Out
-        </Button>
+        <div>
+          <Button id="dashboard-button" onClick={crud}>
+            CRUD
+          </Button>
+        </div>
+        <div>
+          <Button id="dashboard-button" onClick={logout}>
+            Sign Out
+          </Button>
+        </div>
       </div>
     </div>
   );

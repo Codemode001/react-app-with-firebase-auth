@@ -11,12 +11,15 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 import { auth } from "./firebase-config";
 
 const theme = createTheme();
 
 export default function SignUp() {
+  const navigate = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -41,6 +44,7 @@ export default function SignUp() {
         // lastName
       );
       console.log(user);
+      navigate("/");
     } catch (error) {
       console.log(error.message);
       if (!registerEmail && !registerPassword) {
