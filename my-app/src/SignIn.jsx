@@ -130,6 +130,7 @@ export default function SignInSide() {
                     onClick={() => {
                       navigate("/sign-up");
                     }}
+                    id="sign-up-button"
                   >
                     {"Sign Up"}
                   </Link>
