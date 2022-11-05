@@ -125,7 +125,12 @@ export default function SignInSide() {
 
               <Grid container>
                 <Grid item>
-                  <Link href="/sign-up" variant="body2">
+                  <Link
+                    variant="body2"
+                    onClick={() => {
+                      navigate("/sign-up");
+                    }}
+                  >
                     {"Sign Up"}
                   </Link>
                 </Grid>
