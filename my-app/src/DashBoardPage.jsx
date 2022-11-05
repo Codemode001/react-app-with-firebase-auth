@@ -21,6 +21,12 @@ export default function DashBoard() {
     }
   }
 
+  // const check = async () => {
+  //   if (!user) {
+  //     await navigate("/");
+  //   }
+  // };
+
   useEffect(() => {
     check();
   });

@@ -10,10 +10,9 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
-import { auth } from "./firebase-config";
+import { UserAuth } from "./context/authContext";
 
 const theme = createTheme();
 
@@ -32,17 +31,14 @@ export default function SignInSide() {
   const [loginEmail, setLoginEmail] = React.useState("");
   const [loginPassword, setLoginPassword] = React.useState("");
 
+  const { signIn } = UserAuth();
+
   const login = async () => {
     try {
-      const user = await signInWithEmailAndPassword(
-        auth,
-        loginEmail,
-        loginPassword
-      );
+      await signIn(loginEmail, loginPassword);
       navigate("/dashboard");
-      console.log(user);
-    } catch (error) {
-      console.log(error.message);
+    } catch (e) {
+      console.log(e.message);
       alert("invalid email or password");
     }
   };

@@ -15,8 +15,19 @@ import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 
 import "./overrides.css";
+
+import { db } from "./firebase-config";
 
 // const mdTheme = createTheme();
 const darkTheme = createTheme({
@@ -68,15 +79,10 @@ const ManageUsers = () => {
 
   const [modalData, setModalData] = React.useState({});
 
-  const [users, setUsers] = React.useState([
-    { id: "1", firstName: "harold", lastName: "pisos", role: "true" },
-    { id: "2", firstName: "paul", lastName: "belascuain", role: "true" },
-  ]);
-
   const [firstNameValue, setfirstNameValue] = React.useState("");
   const [lastNameValue, setLastNameValue] = React.useState("");
   const [idValue, setIdValue] = React.useState("");
-  const [roleValue, setRoleValue] = React.useState("");
+  const [onlineValue, setOnlineValue] = React.useState("");
 
   const onChangeFirstName = (event) => {
     setfirstNameValue(event.target.value);
@@ -88,62 +94,77 @@ const ManageUsers = () => {
     setIdValue(event.target.value);
   };
   const onChangeRole = (event) => {
-    setRoleValue(event.target.value);
+    setOnlineValue(event.target.value);
   };
 
   // ===========Push value==========
 
-  const addNewUser = () => {
-    users.push({
-      id: idValue,
-      firstName: firstNameValue,
-      lastName: lastNameValue,
-      role: roleValue,
-    });
-
-    setfirstNameValue("");
-    setLastNameValue("");
-    setIdValue("");
-    setRoleValue("");
-    closeAddUser();
-  };
-
-  const editUser = (id) => {
-    for (let user of users) {
-      if (user.id === id) {
-        console.log("do something");
-        if (firstNameValue) {
-          user.firstName = firstNameValue;
-          setfirstNameValue(null);
-        } else {
-          console.log("do nothing");
-        }
-        if (lastNameValue) {
-          user.lastName = lastNameValue;
-          setLastNameValue(null);
-        } else {
-          console.log("do nothing");
-        }
-        if (roleValue) {
-          user.role = roleValue;
-          setRoleValue(null);
-        } else {
-          console.log("do nothing");
-        }
-      }
-    }
-
-    closeEdit();
-  };
-
-  const deleteUser = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
-    closeDelete();
-  };
+  // const deleteUser = (id) => {
+  //   setUsers(users.filter((user) => user.id !== id));
+  //   closeDelete();
+  // };
 
   const goBack = () => {
     navigate("/dashboard");
   };
+
+  // :::::::::::::::::::::::::::::::::::DATABASE INTEGRATION:::::::::::::::::::::::::::::::::::::::::::::::
+
+  const [listOfUsers, setListOfUsers] = React.useState([]);
+  const usersCollectionRef = collection(db, "users");
+
+  const createUser = async () => {
+    await addDoc(usersCollectionRef, {
+      firstName: firstNameValue,
+      lastName: lastNameValue,
+      idNumber: idValue,
+      isOnline: onlineValue,
+    });
+  };
+
+  const updateUser = async (id) => {
+    const userDoc = doc(db, "users", id);
+
+    const newFirstName = {
+      firstName: firstNameValue,
+    };
+    const newLastName = {
+      lastName: lastNameValue,
+    };
+    const newOnline = {
+      isOnline: onlineValue,
+    };
+
+    if (firstNameValue) {
+      await updateDoc(userDoc, newFirstName);
+    }
+    if (lastNameValue) {
+      await updateDoc(userDoc, newLastName);
+    }
+    if (onlineValue) {
+      await updateDoc(userDoc, newOnline);
+    }
+
+    // await updateDoc(userDoc, newFields);
+    closeEdit();
+  };
+
+  const deleteUser = async (id) => {
+    const userDoc = doc(db, "users", id);
+    await deleteDoc(userDoc);
+    closeDelete();
+  };
+
+  //ayha raka amg gamit og callback function pag naay parameters imong functions kay sa onlclick need nimo na e inani onClick(()=> { myFUnction(hello, hi)})
+
+  useEffect(() => {
+    const getUsers = async () => {
+      const data = await getDocs(usersCollectionRef);
+      setListOfUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    };
+
+    getUsers();
+  });
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -190,7 +211,7 @@ const ManageUsers = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((user) => (
+                {listOfUsers.map((user) => (
                   <TableRow
                     // key={user.id} commented, not sure why it's here by default
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -200,13 +221,14 @@ const ManageUsers = () => {
                       scope="row"
                       sx={{ borderBottom: "none" }}
                     >
-                      {user.id}
+                      {user.idNumber}
+                      {/* para ma access ang id nga gi generate ni database tangtanga ang Number */}
                     </TableCell>
                     <TableCell sx={{ borderBottom: "none" }}>
                       {user.firstName + " " + user.lastName}
                     </TableCell>
                     <TableCell sx={{ borderBottom: "none" }}>
-                      {user.role}
+                      {user.isOnline}
                     </TableCell>
                     <TableCell sx={{ borderBottom: "none" }}>
                       <div id="actions-container">
@@ -308,7 +330,7 @@ const ManageUsers = () => {
                       name={"position"}
                       sx={{ marginTop: "1rem" }}
                       defaultValue={""}
-                      value={roleValue}
+                      value={onlineValue}
                       onChange={onChangeRole}
                     />
                   </div>
@@ -321,7 +343,14 @@ const ManageUsers = () => {
                   >
                     Cancel
                   </Button>
-                  <Button id="update" type="submit" onClick={addNewUser}>
+                  <Button
+                    id="update"
+                    type="submit"
+                    onClick={() => {
+                      closeAddUser();
+                      createUser();
+                    }}
+                  >
                     ADD
                   </Button>
                 </div>
@@ -330,7 +359,7 @@ const ManageUsers = () => {
           </Container>
         </Box>
       </Box>{" "}
-      \{/* =======START OF EDIT MODAL========= */}
+      {/* =======START OF EDIT MODAL========= */}
       <Modal
         open={openEditUser}
         onClose={closeEdit}
@@ -384,10 +413,10 @@ const ManageUsers = () => {
             <div id="bottomInputs">
               <TextField
                 id="outlined-basic"
-                label="Position *"
+                label="isOnline *"
                 variant="outlined"
-                name={"position"}
-                defaultValue={modalData.role}
+                name={"isOnline"}
+                defaultValue={modalData.isOnline}
                 onChange={onChangeRole}
                 sx={{ marginTop: "1rem" }}
               />
@@ -405,7 +434,7 @@ const ManageUsers = () => {
               id="update"
               type="submit"
               onClick={() => {
-                editUser(modalData.id);
+                updateUser(modalData.id);
               }}
             >
               Update
@@ -451,6 +480,18 @@ const ManageUsers = () => {
           </div>
         </Box>
       </Modal>
+      {/* <div style={{ color: "white" }}>
+        {listOfUsers.map((user) => {
+          return (
+            <div>
+              <h1>name: {user.name}</h1>
+              <h1>id: {user.idNumber}</h1>
+              <h1>isOnline: {user.isOnline}</h1>
+            </div>
+          );
+        })}
+        // ------> means kada user mag return ka og div nga naay h1 name, id og is online  
+      </div> */}
     </ThemeProvider>
   );
 };

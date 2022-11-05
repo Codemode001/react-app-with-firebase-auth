@@ -10,16 +10,14 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
-import { auth } from "./firebase-config";
+import { UserAuth } from "./context/authContext";
 
 const theme = createTheme();
 
 export default function SignUp() {
   const navigate = useNavigate();
-
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -31,22 +29,16 @@ export default function SignUp() {
 
   const [registerEmail, setRegisterEmail] = React.useState("");
   const [registerPassword, setRegisterPassword] = React.useState("");
-  // const [firstName, setFirstName] = React.useState("");
-  // const [lastName, setLastName] = React.useState("");
 
-  const register = async () => {
+  const { createUser } = UserAuth();
+
+  const register = async (e) => {
+    e.preventDefault();
     try {
-      const user = await createUserWithEmailAndPassword(
-        auth,
-        registerEmail,
-        registerPassword
-        // firstName,
-        // lastName
-      );
-      console.log(user);
-      navigate("/");
-    } catch (error) {
-      console.log(error.message);
+      await createUser(registerEmail, registerPassword);
+      navigate("/dashboard");
+    } catch {
+      console.log(e.message);
       if (!registerEmail && !registerPassword) {
         alert("please input something");
       } else {
@@ -82,33 +74,6 @@ export default function SignUp() {
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
-              {/* <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                  onChange={(event) => {
-                    setFirstName(event.target.value);
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                  onChange={(event) => {
-                    setLastName(event.target.value);
-                  }}
-                />
-              </Grid> */}
               <Grid item xs={12}>
                 <TextField
                   required
